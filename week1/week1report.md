@@ -97,7 +97,29 @@ Therefore adding a script on start-up is ideal to automate this process.
 
 ### 6. - Which users exist on which machines?
 
+A root user (superuser with admin permissions)
+A Vagrant user which is used for all virtual machines.
+
 ### 7. - What is the purpose (which processes or packages for example are essential) of each machine?
+1. Isprouter: This machine acts as a gateway between the NAT and host-only network.
+Essential processes would include routing services, and possibly NAT and firewall functionalities. An essential package is openssh for secure remote management of the router.
+
+2. companyrouter: Serves as a router between the host-only network and the internal "company" network. Similar to the isprouter, and has packages like networkmanager, openssh and openssl.
+
+3. database: As the name suggests, this machine is probably running a database. Essential packages could be MySQL, and the essential process would be the database service itself.
+
+4. web: Likely a web server, hosting a website or web application.
+
+
+5. dc: This is a Domain Controller and also serves as a DNS server. Having processes such as AD DC, DNS server and some tools.
+
+6. win10: A typical Windows 10 client machine. Essential processes will vary depending on its use-case but generally, it will run processes related to the OS and any user-installed applications.
+
 
 ### 8. - Investigate whether the DNS server of the company network is vulnerable to a DNS Zone Transfer "attack" as discussed above...
 
+Using the `dig` command from the red machine, we can attempt to check if the company network is vulnerable to DNS Zone Transfer attacks.
+1. Find the DNS server IP and domain name on the DC VM using `ipconfig /all` - you will now see all network information.
+2. Identify and write down the primary Dns suffix and IPv4 address.
+3. Now you need to execute the test by using `nslookup -type=AXFR insecure.cyb 172.30.0.4` for WIndows or  `dig axfr @172.30.0.4 insecure.cyb` for Linux.
+4. I received a timeout message suggesting the network is properly set up against these attacks. To test and validate that your red machine can actually reach the dc machine, use `ping 172.30.0.4`. 
